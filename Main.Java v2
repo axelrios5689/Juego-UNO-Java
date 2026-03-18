@@ -1,0 +1,286 @@
+import java.util.*;
+
+class Carta {
+    String color;
+    String valor;
+
+    static final String RESET = "\u001B[0m";
+    static final String ROJO = "\u001B[31m";
+    static final String VERDE = "\u001B[32m";
+    static final String AMARILLO = "\u001B[33m";
+    static final String AZUL = "\u001B[34m";
+    static final String BLANCO = "\u001B[37m";
+
+    public Carta(String color, String valor) {
+        this.color = color;
+        this.valor = valor;
+    }
+
+    String colorANSI() {
+        switch (color) {
+            case "Rojo": return ROJO;
+            case "Verde": return VERDE;
+            case "Azul": return AZUL;
+            case "Amarillo": return AMARILLO;
+            default: return BLANCO;
+        }
+    }
+
+    public String[] dibujar() {
+        String c = colorANSI();
+        return new String[]{
+            c + "+----------+" + RESET,
+            c + "| " + String.format("%-8s", valor) + " |" + RESET,
+            c + "|          |" + RESET,
+            c + "| " + String.format("%-8s", color) + " |" + RESET,
+            c + "|          |" + RESET,
+            c + "| " + String.format("%8s", valor) + " |" + RESET,
+            c + "+----------+" + RESET
+        };
+    }
+}
+
+class Baraja {
+    List<Carta> cartas = new ArrayList<>();
+
+    public Baraja() {
+        crear();
+        Collections.shuffle(cartas);
+    }
+
+    void crear() {
+        String[] colores = {"Rojo", "Verde", "Azul", "Amarillo"};
+        for (String color : colores) {
+            cartas.add(new Carta(color, "0"));
+            for (int i = 1; i <= 9; i++) {
+                cartas.add(new Carta(color, "" + i));
+                cartas.add(new Carta(color, "" + i));
+            }
+            // Implementación de cartas especiales: Reversa, Salto, Roba 2
+            for (int i = 0; i < 2; i++) {
+                cartas.add(new Carta(color, "+2"));
+                cartas.add(new Carta(color, "salto"));
+                cartas.add(new Carta(color, "rev"));
+            }
+        }
+        // Implementación de cartas especiales: Roba 4 y Comodín
+        for (int i = 0; i < 4; i++) {
+            cartas.add(new Carta("Negro", "+4"));
+            cartas.add(new Carta("Negro", "comodin"));
+        }
+    }
+
+    Carta repartir() {
+        if (cartas.isEmpty()) return null;
+        return cartas.remove(cartas.size() - 1);
+    }
+}
+
+class Jugador {
+    String nombre;
+    List<Carta> mano = new ArrayList<>();
+
+    public Jugador(String nombre) {
+        this.nombre = nombre;
+    }
+
+    void recibir(Carta c) {
+        if (c != null) mano.add(c);
+    }
+
+    void verMano() {
+        System.out.println("\nMano de " + nombre + " (" + mano.size() + " cartas):");
+        for (int i = 0; i < mano.size(); i += 5) {
+            int fin = Math.min(i + 5, mano.size());
+            mostrarFila(i, fin);
+        }
+    }
+
+    private void mostrarFila(int inicio, int fin) {
+        // Alineación corregida de los índices centrados sobre las cartas
+        for (int i = inicio; i < fin; i++) {
+            System.out.printf("     [%d]      ", i);
+        }
+        System.out.println();
+
+        for (int linea = 0; linea < 7; linea++) {
+            for (int i = inicio; i < fin; i++) {
+                String[] d = mano.get(i).dibujar();
+                System.out.print(d[linea] + "  ");
+            }
+            System.out.println();
+        }
+    }
+}
+
+class Juego {
+    List<Jugador> jugadores = new ArrayList<>();
+    Baraja mazo = new Baraja();
+    Carta mesa;
+    String colorActual;
+    int turno = 0;
+    Scanner sc = new Scanner(System.in);
+
+    void registrar(String nombre) {
+        // Modalidad Humano vs Computadora
+        jugadores.add(new Jugador(nombre));
+        jugadores.add(new Jugador("CPU"));
+    }
+
+    void repartir() {
+        for (Jugador j : jugadores)
+            for (int i = 0; i < 7; i++) j.recibir(mazo.repartir());
+
+        boolean cartaValida = false;
+        while (!cartaValida) {
+            mesa = mazo.repartir();
+            if (mesa.valor.matches("\\d") && !mesa.color.equals("Negro")) {
+                cartaValida = true;
+            } else {
+                mazo.cartas.add(0, mesa);
+            }
+        }
+        colorActual = mesa.color;
+    }
+
+    boolean esValida(Carta c) {
+        return c.color.equals(colorActual) || c.valor.equals(mesa.valor) || c.color.equals("Negro");
+    }
+
+    void aplicarEfecto(Carta c) {
+        // Regla: Reversa con 2 jugadores funciona como Salto
+        if (c.valor.equals("salto") || c.valor.equals("rev")) {
+            avanzar();
+            System.out.println("¡El siguiente jugador pierde su turno!");
+        } else if (c.valor.equals("+2")) {
+            avanzar();
+            Jugador j = jugadores.get(turno);
+            j.recibir(mazo.repartir()); j.recibir(mazo.repartir());
+            System.out.println(j.nombre + " roba 2 cartas y pierde turno.");
+        } else if (c.valor.equals("+4")) {
+            avanzar();
+            Jugador j = jugadores.get(turno);
+            for (int i = 0; i < 4; i++) j.recibir(mazo.repartir());
+            System.out.println(j.nombre + " roba 4 cartas y pierde turno.");
+        }
+    }
+
+    void avanzar() {
+        turno = (turno + 1) % jugadores.size();
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Introduce tu nombre:");
+        String nombre = sc.nextLine();
+
+        Juego juego = new Juego();
+        juego.registrar(nombre);
+        juego.repartir();
+
+        while (true) {
+            Jugador actual = juego.jugadores.get(juego.turno);
+            System.out.println("\n--- CARTA EN MESA ---");
+            for (String l : juego.mesa.dibujar()) System.out.println(l);
+            System.out.println("Color actual: " + juego.colorActual);
+
+            if (!actual.nombre.equals("CPU")) {
+                actual.verMano();
+                System.out.println("1. Jugar | 2. Robar");
+                int op = leerOpcion(sc, 1, 2);
+
+                if (op == 1) {
+                    System.out.println("Indice de carta:");
+                    int idx = leerOpcion(sc, 0, actual.mano.size() - 1);
+                    Carta elegida = actual.mano.get(idx);
+
+                    if (juego.esValida(elegida)) {
+                        procesarJugada(juego, actual, elegida, sc);
+                    } else {
+                        System.out.println("Carta inválida. Elige otra o roba.");
+                        continue;
+                    }
+                } else {
+                    Carta robada = juego.mazo.repartir();
+                    System.out.println("\nRobaste:");
+                    for (String l : robada.dibujar()) System.out.println(l);
+                    
+                    System.out.println("¿Quieres jugarla? (s/n)");
+                    if (sc.nextLine().equalsIgnoreCase("s")) {
+                        if (juego.esValida(robada)) {
+                            procesarJugada(juego, actual, robada, sc);
+                        } else {
+                            // Regla: Si roba y la carta no es válida -> pierde turno
+                            System.out.println("No se puede jugar. Pierdes turno.");
+                            actual.recibir(robada);
+                        }
+                    } else {
+                        System.out.println("Carta guardada. Pierdes turno.");
+                        actual.recibir(robada);
+                    }
+                }
+                
+                // Regla "UNO": Si jugador tiene 1 carta debe decir "UNO"
+                if (actual.mano.size() == 1) {
+                    System.out.print("¡Escribe UNO!: ");
+                    if (!sc.nextLine().equalsIgnoreCase("UNO")) {
+                        System.out.println("Penalización +2 por no decir UNO.");
+                        actual.recibir(juego.mazo.repartir());
+                        actual.recibir(juego.mazo.repartir());
+                    }
+                }
+            } else {
+                Carta paraJugar = null;
+                for (Carta c : actual.mano) {
+                    if (juego.esValida(c)) { paraJugar = c; break; }
+                }
+
+                if (paraJugar != null) {
+                    System.out.println("\nCPU jugó: " + paraJugar.color + " " + paraJugar.valor);
+                    procesarJugada(juego, actual, paraJugar, sc);
+                } else {
+                    System.out.println("\nCPU roba y pasa.");
+                    actual.recibir(juego.mazo.repartir());
+                }
+            }
+
+            if (actual.mano.isEmpty()) {
+                System.out.println("\n¡GANADOR: " + actual.nombre + "!");
+                break;
+            }
+            juego.avanzar();
+        }
+    }
+
+    static void procesarJugada(Juego juego, Jugador j, Carta c, Scanner sc) {
+        j.mano.remove(c);
+        juego.mesa = c;
+        if (c.color.equals("Negro")) {
+            if (!j.nombre.equals("CPU")) {
+                System.out.println("Elige color: 1.Rojo 2.Verde 3.Azul 4.Amarillo");
+                int col = leerOpcion(sc, 1, 4);
+                String[] cols = {"Rojo", "Verde", "Azul", "Amarillo"};
+                juego.colorActual = cols[col - 1];
+            } else {
+                juego.colorActual = "Rojo";
+                System.out.println("CPU cambió color a Rojo");
+            }
+        } else {
+            juego.colorActual = c.color;
+        }
+        juego.aplicarEfecto(c);
+    }
+
+    static int leerOpcion(Scanner sc, int min, int max) {
+        while (true) {
+            try {
+                String entrada = sc.nextLine();
+                int n = Integer.parseInt(entrada);
+                if (n >= min && n <= max) return n;
+            } catch (Exception e) {}
+            System.out.println("Opción inválida.");
+        }
+    }
+}
