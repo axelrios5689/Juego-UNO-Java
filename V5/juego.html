@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNO Party Galactic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Orbitron:wght@400;700&family=Poppins:wght@400;600;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/style.css">
+    <style>
+        /* ==================== FONDO MESA GALÁCTICA ==================== */
+        .mesa {
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at 30% 20%, rgba(138, 43, 226, 0.4) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(0, 245, 255, 0.4) 0%, transparent 50%),
+                        radial-gradient(circle at 20% 80%, rgba(255, 0, 170, 0.3) 0%, transparent 50%),
+                        #0a001f;
+            background-size: 200% 200%, 200% 200%, 200% 200%, 100% 100%;
+            animation: nebula-move 45s ease infinite;
+            position: relative;
+            overflow: hidden;
+            border: 32px solid #1a0033;
+            box-shadow: inset 0 0 160px rgba(138, 43, 226, 0.6),
+                        inset 0 0 100px rgba(0, 245, 255, 0.5),
+                        0 0 70px #ffd700;
+            padding: 40px 35px 35px 35px;
+            box-sizing: border-box;
+        }
+
+        @keyframes nebula-move {
+            0%, 100% { background-position: 0% 0%, 100% 100%, 0% 50%; }
+            50% { background-position: 100% 100%, 0% 0%, 100% 50%; }
+        }
+
+        .mesa::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: transparent;
+            box-shadow: 180px 90px 2px #fff, 350px 250px 1px #fff, 720px 140px 2px #fff,
+                        920px 480px 1px #fff, 140px 550px 2px #fff, 480px 680px 1px #fff,
+                        810px 320px 2px #fff, 980px 170px 1px #fff;
+            animation: stars-twinkle 7s infinite alternate;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.85;
+        }
+
+        @keyframes stars-twinkle { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        .mesa::after {
+            content: '';
+            position: absolute;
+            inset: 20px;
+            border: 10px solid transparent;
+            border-image: linear-gradient(45deg, #00f5ff, #ff00aa, #ffd700, #00f5ff) 1;
+            pointer-events: none;
+            box-shadow: inset 0 0 70px rgba(255, 215, 0, 0.5);
+            z-index: 2;
+        }
+
+        /* ==================== DESCARTES - CORREGIDO DEFINITIVAMENTE ==================== */
+        .descartes-pile {
+            width: 110px !important;
+            height: 155px !important;
+            border: 6px solid white !important;
+            border-radius: 18px !important;
+            box-shadow: 0 0 40px rgba(0,245,255,0.6), 0 15px 40px rgba(0,0,0,0.7) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 3rem !important;
+            font-weight: 900 !important;
+            color: white !important;
+            position: relative !important;
+            overflow: hidden !important;
+            transition: all 0.3s ease !important;
+        }
+
+        /* Colores normales */
+        .descartes-pile.rojo     { background: linear-gradient(#ff3366, #aa1122) !important; }
+        .descartes-pile.azul     { background: linear-gradient(#00aaff, #0066aa) !important; }
+        .descartes-pile.verde    { background: linear-gradient(#00ff99, #00aa66) !important; }
+        .descartes-pile.amarillo { background: linear-gradient(#ffee44, #ccaa00) !important; color: #000 !important; }
+
+        /* Comodines */
+        .descartes-pile.comodin-en-mesa {
+            background: linear-gradient(145deg, #1a0033, #4a0088) !important;
+            border-color: #ffd700 !important;
+        }
+        .descartes-pile.comodin-en-mesa.rojo     { background: linear-gradient(#ff3366, #aa1122) !important; }
+        .descartes-pile.comodin-en-mesa.azul     { background: linear-gradient(#00aaff, #0066aa) !important; }
+        .descartes-pile.comodin-en-mesa.verde    { background: linear-gradient(#00ff99, #00aa66) !important; }
+        .descartes-pile.comodin-en-mesa.amarillo { background: linear-gradient(#ffee44, #ccaa00) !important; color: #000 !important; }
+
+        .descartes-pile.comodin-plus4::after {
+            content: "+4" !important;
+            font-size: 3.4rem !important;
+            text-shadow: 0 0 25px #ff00aa !important;
+        }
+
+        /* ==================== CARTAS ==================== */
+        .carta {
+            width: 68px;
+            height: 96px;
+            border-radius: 12px;
+            border: 6px solid #fff;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6), inset 0 0 12px rgba(255,255,255,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            font-weight: 900;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .carta.rojo     { background: linear-gradient(#ff3344, #cc1122); }
+        .carta.azul     { background: linear-gradient(#3388ff, #0055cc); }
+        .carta.verde    { background: linear-gradient(#22cc77, #009955); }
+        .carta.amarillo { background: linear-gradient(#ffdd33, #ccaa00); color: #000; }
+
+        .carta.comodin-galaxy,
+        .carta.comodin-plus4 {
+            background: linear-gradient(135deg, #4a0088, #1a0033);
+            color: #ffd700;
+        }
+
+        .carta.comodin-plus4::after {
+            content: "+4";
+            font-size: 2.8rem;
+            font-weight: 900;
+        }
+
+        .carta:hover {
+            transform: scale(1.12);
+            box-shadow: 0 15px 35px rgba(255, 215, 0, 0.6);
+        }
+
+        .mano {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: -18px;
+            padding: 25px 0 15px 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .mano .carta:hover {
+            transform: scale(1.28) translateY(-48px) rotate(0deg) !important;
+            z-index: 30;
+        }
+
+        #btn-uno {
+            position: absolute;
+            bottom: 38%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            width: 82px;
+            height: 82px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #ffd700, #ffea00);
+            color: #000;
+            border: none;
+            border-radius: 50%;
+            box-shadow: 0 0 30px #ffd700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #evelin-mesa { position: relative; z-index: 3; height: 100%; }
+
+        /* ==================== SUPER MODAL GANADOR CON CONFETI Y TROFEO ==================== */
+        #winner-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(10, 15, 40, 0.96);
+            z-index: 100000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-family: 'Audiowide', sans-serif;
+        }
+
+        .winner-content {
+            text-align: center;
+            background: linear-gradient(145deg, #1a0033, #4a0088);
+            padding: 50px 70px;
+            border-radius: 30px;
+            border: 8px solid #ffd700;
+            box-shadow: 0 0 80px #ffd700, 0 0 120px rgba(255, 215, 0, 0.6);
+            max-width: 620px;
+            animation: winnerPop 0.6s ease;
+        }
+
+        @keyframes winnerPop { 0% { transform: scale(0.6); } 100% { transform: scale(1); } }
+
+        .winner-title {
+            font-size: 4.2rem;
+            color: #ffd700;
+            text-shadow: 0 0 30px #ffd700, 0 0 60px #ff00aa;
+            margin-bottom: 15px;
+            line-height: 1;
+        }
+
+        .winner-subtitle {
+            font-size: 2.1rem;
+            color: #00f5ff;
+            margin-bottom: 25px;
+        }
+
+        .trophy {
+            font-size: 9rem;
+            margin: 20px 0;
+            animation: trophyFloat 2s infinite ease-in-out;
+        }
+
+        @keyframes trophyFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-25px); } }
+
+        #confetti-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="mesa">
+        <!-- NAVE ESPACIAL -->
+        <div onclick="toggleConfig()" style="position:absolute; top:35px; right:35px; font-size:2.6rem; cursor:pointer; z-index:1000; background:rgba(255,215,0,0.25); border:4px solid #ffd700; border-radius:50%; padding:10px 15px; box-shadow:0 0 35px #ffd700;">
+            🚀
+        </div>
+
+        <div id="evelin-mesa">
+            <div class="jugador-top">
+                <div>
+                    <div class="jugador-info"><div class="avatar"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Tania"></div><div class="badge-nombre">TANIA</div></div>
+                    <div class="mano" id="mano-tania"></div>
+                </div>
+            </div>
+            <div class="jugador-left">
+                <div>
+                    <div class="jugador-info"><div class="avatar"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Pedro"></div><div class="badge-nombre">PEDRO</div></div>
+                    <div class="mano" id="mano-pedro"></div>
+                </div>
+            </div>
+
+            <div class="centro">
+                <div class="pile-container">
+                    <div style="color:#00f5ff; font-weight:700; margin-bottom:8px;">MAZO</div>
+                    <div id="mazo" class="mazo-stack" onclick="drawFromDeck()">
+                        <div class="mazo-card"></div>
+                        <div class="mazo-card"></div>
+                        <div class="mazo-card"></div>
+                        <div class="mazo-main"><div style="font-family:'Orbitron',sans-serif; font-size:1.6rem; color:#ffd700;">UNO</div></div>
+                    </div>
+                </div>
+                <div class="pile-container">
+                    <div style="color:#ff00aa; font-weight:700; margin-bottom:8px;">DESCARTES</div>
+                    <div id="mesa" class="descartes-pile"></div>
+                </div>
+            </div>
+
+            <div class="jugador-right">
+                <div>
+                    <div class="jugador-info"><div class="avatar"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Maria"></div><div class="badge-nombre">MARÍA</div></div>
+                    <div class="mano" id="mano-maria"></div>
+                </div>
+            </div>
+
+            <div class="jugador-bottom">
+                <div>
+                    <div class="jugador-info" style="border-color:#ff00aa;">
+                        <div class="avatar" style="border-color:#ff00aa;"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Eve"></div>
+                        <div class="badge-nombre" id="mi-nombre">GALACTIC_NAME</div>
+                    </div>
+                    <div id="mi-turno-label" style="display:none; color:#00f5ff; font-weight:bold;">Tu turno</div>
+                    <div class="mano" id="mis-cartas"></div>
+                </div>
+            </div>
+        </div>
+
+        <button id="btn-uno" onclick="gritarUno()">¡UNO!</button>
+    </div>
+
+    <!-- Modales -->
+    <div id="config-modal" style="display:none;">
+        <div style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:linear-gradient(145deg, #1a0033, #4a0088); border:5px solid #ffd700; border-radius:20px; padding:35px; width:360px; text-align:center; box-shadow:0 0 60px #ffd700; z-index:10000;">
+            <h2 style="color:#ffd700; margin-bottom:25px;">🚀 NAVE DE CONTROL</h2>
+            <button onclick="goToMenu()" style="display:block; width:100%; padding:16px; margin:12px 0; background:#ff3366; color:white; border:none; border-radius:12px; font-size:1.2rem;">← Salir al Menú Principal</button>
+            <button onclick="toggleConfig()" style="display:block; width:100%; padding:16px; margin:12px 0; background:#00f5ff; color:black; border:none; border-radius:12px; font-size:1.2rem;">Regresar a la Partida</button>
+        </div>
+    </div>
+
+    <div id="modal-color" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(10, 31, 61, 0.98); border: 4px solid #ffd700; padding: 30px; border-radius: 20px; z-index: 10000; text-align: center; box-shadow: 0 0 40px #ffd700;">
+        <h3 style="color: #ffd700; margin-bottom: 20px;">Selecciona el nuevo color orbital</h3>
+        <div style="display: flex; gap: 15px; justify-content: center;">
+            <button onclick="elegirColorComodin('rojo')" style="width:80px;height:80px;border-radius:50%;background:#ff0055;border:3px solid white;color:white;font-weight:bold;">Rojo</button>
+            <button onclick="elegirColorComodin('azul')" style="width:80px;height:80px;border-radius:50%;background:#00d2ff;border:3px solid white;color:white;font-weight:bold;">Azul</button>
+            <button onclick="elegirColorComodin('verde')" style="width:80px;height:80px;border-radius:50%;background:#00ff66;border:3px solid white;color:black;font-weight:bold;">Verde</button>
+            <button onclick="elegirColorComodin('amarillo')" style="width:80px;height:80px;border-radius:50%;background:#ffea00;border:3px solid white;color:black;font-weight:bold;">Amarillo</button>
+        </div>
+    </div>
+
+    <!-- SUPER MODAL GANADOR -->
+    <div id="winner-modal">
+        <canvas id="confetti-canvas"></canvas>
+        <div class="winner-content">
+            <div id="winner-message" class="winner-title"></div>
+            <div id="winner-subtitle" class="winner-subtitle"></div>
+            <div class="trophy">🏆</div>
+            <button onclick="restartGame()" style="margin-top:30px; padding:18px 50px; font-size:1.4rem; background:#ffd700; color:#000; border:none; border-radius:50px; font-weight:900; box-shadow:0 0 30px #ffd700;">
+                JUGAR OTRA PARTIDA
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let deck = [], playerHand = [], discardPile = [];
+        let direction = 1, currentTurn = 0;
+        let hasDrawnThisTurn = false;
+        let numPlayers = 4;
+        let players = ["Jugador", "Tania", "Pedro", "María"];
+        let playerHands = [[], [], [], []];
+        let unoShouted = [false, false, false, false];
+
+        function cargarConfiguracion() {
+            let cantidad = 4;
+            try {
+                const guardado = localStorage.getItem('cantidadJugadores');
+                if (guardado) cantidad = parseInt(guardado);
+            } catch (e) {}
+            numPlayers = cantidad;
+            players = ["Jugador", "Tania", "Pedro", "María"].slice(0, numPlayers);
+            playerHands = Array.from({ length: numPlayers }, () => []);
+            unoShouted = new Array(numPlayers).fill(false);
+            ocultarOponentesInnecesarios();
+        }
+
+        function ocultarOponentesInnecesarios() {
+            const left = document.querySelector('.jugador-left');
+            const right = document.querySelector('.jugador-right');
+            if (numPlayers === 2) { if (left) left.style.display = 'none'; if (right) right.style.display = 'none'; }
+            else if (numPlayers === 3) { if (right) right.style.display = 'none'; }
+        }
+
+        function createDeck() {
+            const colors = ['rojo','azul','verde','amarillo'];
+            const values = ['0','1','2','3','4','5','6','7','8','9','+2','reversa','salto'];
+            let d = [];
+            colors.forEach(c => values.forEach(v => {
+                d.push({color:c, value:v});
+                if(v !== '0') d.push({color:c, value:v});
+            }));
+            for(let i=0; i<4; i++) {
+                d.push({color:'negro', value:'comodin'});
+                d.push({color:'negro', value:'comodin+4'});
+            }
+            return d.sort(() => Math.random() - 0.5);
+        }
+
+        function drawCard() {
+            if (deck.length === 0) {
+                const last = discardPile.pop();
+                deck = [...discardPile];
+                discardPile = [last];
+                deck.sort(() => Math.random() - 0.5);
+            }
+            return deck.pop();
+        }
+
+        function traducirValorEspecial(valor) {
+            if (valor === 'reversa') return '🔄';
+            if (valor === 'salto') return '🚫';
+            if (valor === '+2') return '+2';
+            return valor;
+        }
+
+        function renderPlayerHand() {
+            const container = document.getElementById('mis-cartas');
+            container.innerHTML = '';
+            playerHand.forEach((card, index) => {
+                const el = document.createElement('div');
+                if (card.value === 'comodin+4') {
+                    el.className = 'carta comodin-galaxy comodin-plus4';
+                } else if (card.value === 'comodin') {
+                    el.className = 'carta comodin-galaxy';
+                    el.textContent = '🌟';
+                } else {
+                    el.className = `carta ${card.color}`;
+                    el.textContent = traducirValorEspecial(card.value);
+                }
+                el.onclick = () => playCard(index);
+                container.appendChild(el);
+            });
+        }
+
+        function renderOpponentHand(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            let handIndex = containerId === 'mano-tania' ? 1 : containerId === 'mano-pedro' ? 2 : 3;
+            if (playerHands[handIndex]) {
+                playerHands[handIndex].forEach(() => {
+                    const el = document.createElement('div');
+                    el.className = 'carta reverso';
+                    container.appendChild(el);
+                });
+            }
+        }
+
+        function renderAllHands() {
+            renderPlayerHand();
+            if (numPlayers > 1) renderOpponentHand('mano-tania');
+            if (numPlayers > 2) renderOpponentHand('mano-pedro');
+            if (numPlayers > 3) renderOpponentHand('mano-maria');
+        }
+
+        /** FUNCIÓN UPDATE DISCARD ULTRA REFORZADA - BUG SOLUCIONADO */
+        function updateDiscard() {
+            const el = document.getElementById('mesa');
+            if (!el || discardPile.length === 0) return;
+
+            const top = discardPile[discardPile.length - 1];
+
+            // RESET TOTAL Y AGRESIVO
+            el.className = 'descartes-pile';
+            el.style.cssText = '';
+            el.innerHTML = '';
+            el.textContent = '';
+
+            // Quitar todas las clases posibles
+            el.classList.remove('rojo', 'azul', 'verde', 'amarillo', 'comodin-en-mesa', 'comodin-plus4');
+
+            if (top.value === 'comodin+4') {
+                el.classList.add('comodin-en-mesa', 'comodin-plus4');
+                if (top.color) el.classList.add(top.color);
+            } else if (top.value === 'comodin') {
+                el.classList.add('comodin-en-mesa');
+                if (top.color) el.classList.add(top.color);
+            } else {
+                if (top.color) el.classList.add(top.color);
+                el.textContent = traducirValorEspecial(top.value);
+            }
+
+            // Forzar repintado del navegador
+            void el.offsetWidth;
+        }
+
+        function isLegalPlay(card, topCard) {
+            if (!topCard) return false;
+            if (card.color === 'negro') return true;
+            return card.color === topCard.color || card.value === topCard.value;
+        }
+
+        function advanceTurn(times = 1) {
+            for (let i = 0; i < times; i++) {
+                currentTurn = (currentTurn + direction + numPlayers) % numPlayers;
+            }
+            hasDrawnThisTurn = false;
+            updateTurnIndicator();
+            if (checkWin()) return;
+            if (currentTurn !== 0) setTimeout(() => aiPlay(currentTurn), 900);
+        }
+
+        function handleSpecialCard(card, playerIndex) {
+            let skipTurns = 1;
+            if (card.value === '+2') {
+                const nextPlayer = (playerIndex + direction + numPlayers) % numPlayers;
+                drawMultiple(nextPlayer, 2);
+                skipTurns = 2;
+            }
+            if (card.value === 'reversa') direction *= -1;
+            if (card.value === 'salto') skipTurns = 2;
+
+            if (card.value === 'comodin' || card.value === 'comodin+4') {
+                if (playerIndex === 0) {
+                    abrirModalColor(card.value === 'comodin+4');
+                    return;
+                } else {
+                    const colors = ['rojo','azul','verde','amarillo'];
+                    discardPile[discardPile.length-1].color = colors[Math.floor(Math.random()*4)];
+                }
+            }
+
+            if (card.value === 'comodin+4' && playerIndex !== 0) {
+                const nextPlayer = (playerIndex + direction + numPlayers) % numPlayers;
+                drawMultiple(nextPlayer, 4);
+                skipTurns = 2;
+            }
+            advanceTurn(skipTurns);
+        }
+
+        function abrirModalColor(isPlus4) {
+            window.isPlus4Temp = isPlus4;
+            document.getElementById('modal-color').style.display = 'block';
+        }
+
+        function elegirColorComodin(color) {
+            document.getElementById('modal-color').style.display = 'none';
+            discardPile[discardPile.length-1].color = color;
+            updateDiscard();
+            if (window.isPlus4Temp) {
+                const nextPlayer = (currentTurn + direction + numPlayers) % numPlayers;
+                drawMultiple(nextPlayer, 4);
+            }
+            advanceTurn(1);
+            window.isPlus4Temp = null;
+        }
+
+        function playCard(index) {
+            if (currentTurn !== 0) return;
+            const card = playerHand[index];
+            const top = discardPile[discardPile.length-1];
+            if (!isLegalPlay(card, top)) {
+                alert("Esa carta no se puede jugar");
+                return;
+            }
+            discardPile.push(card);
+            playerHand.splice(index, 1);
+
+            if (playerHand.length === 1 && !unoShouted[0]) {
+                alert("¡No gritaste ¡UNO! Recibes +2 cartas de penalización.");
+                drawMultiple(0, 2);
+            }
+
+            updateDiscard();
+            renderAllHands();
+            handleSpecialCard(card, 0);
+        }
+
+        function drawMultiple(playerIndex, amount) {
+            for (let i = 0; i < amount; i++) playerHands[playerIndex].push(drawCard());
+            renderAllHands();
+            if (playerHands[playerIndex].length > 1) unoShouted[playerIndex] = false;
+        }
+
+        function aiPlay(playerIndex) {
+            renderAllHands();
+            const hand = playerHands[playerIndex];
+            const top = discardPile[discardPile.length-1];
+
+            for (let i = 0; i < hand.length; i++) {
+                if (isLegalPlay(hand[i], top)) {
+                    const card = hand[i];
+                    discardPile.push(card);
+                    hand.splice(i,1);
+
+                    if (hand.length === 1) {
+                        unoShouted[playerIndex] = true;
+                        alert(players[playerIndex] + " gritó ¡UNO! 🎉");
+                    }
+
+                    updateDiscard();
+                    renderAllHands();
+                    handleSpecialCard(card, playerIndex);
+                    if (checkWin()) return;
+                    return;
+                }
+            }
+
+            const drawn = drawCard();
+            hand.push(drawn);
+
+            if (isLegalPlay(drawn, top)) {
+                discardPile.push(drawn);
+                hand.pop();
+
+                if (hand.length === 1) {
+                    unoShouted[playerIndex] = true;
+                    alert(players[playerIndex] + " gritó ¡UNO! 🎉");
+                }
+
+                updateDiscard();
+                renderAllHands();
+                handleSpecialCard(drawn, playerIndex);
+                if (checkWin()) return;
+            } else {
+                advanceTurn(1);
+            }
+        }
+
+        function drawFromDeck() {
+            if (currentTurn !== 0 || hasDrawnThisTurn) return;
+            hasDrawnThisTurn = true;
+            const newCard = drawCard();
+            playerHand.push(newCard);
+            renderAllHands();
+            const top = discardPile[discardPile.length-1];
+            if (isLegalPlay(newCard, top)) {
+                if (confirm(`Robaste: ${newCard.value} de ${newCard.color}\n¿Quieres jugarla?`)) {
+                    const lastIndex = playerHand.length - 1;
+                    const card = playerHand[lastIndex];
+                    discardPile.push(card);
+                    playerHand.splice(lastIndex, 1);
+                    updateDiscard();
+                    renderAllHands();
+                    handleSpecialCard(card, 0);
+                } else {
+                    advanceTurn(1);
+                }
+            } else {
+                advanceTurn(1);
+            }
+        }
+
+        function gritarUno() {
+            if (playerHand.length <= 2) {
+                unoShouted[0] = true;
+                alert("¡Bien! Dijiste ¡UNO!");
+            } else {
+                alert("Solo puedes decir ¡UNO! cuando te queden 2 cartas o menos.");
+            }
+        }
+
+        function checkWin() {
+            for (let i = 0; i < numPlayers; i++) {
+                if (playerHands[i].length === 0) {
+                    const modal = document.getElementById('winner-modal');
+                    const title = document.getElementById('winner-message');
+                    const subtitle = document.getElementById('winner-subtitle');
+
+                    if (i === 0) {
+                        title.innerHTML = `¡VICTORIA<br>GALÁCTICA!`;
+                        subtitle.textContent = "¡Has ganado el campeonato intergaláctico! 🌌";
+                    } else {
+                        title.textContent = "¡PARTIDA TERMINADA!";
+                        subtitle.textContent = `${players[i]} ganó la partida`;
+                    }
+
+                    modal.style.display = 'flex';
+                    launchConfetti();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function launchConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height - canvas.height;
+                    this.size = Math.random() * 12 + 6;
+                    this.speed = Math.random() * 7 + 4;
+                    this.angle = Math.random() * 360;
+                    this.color = ['#ffd700','#ff00aa','#00f5ff','#22ff88'][Math.floor(Math.random()*4)];
+                }
+                update() { this.y += this.speed; this.angle += 5; }
+                draw() {
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate(this.angle * Math.PI / 180);
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+                    ctx.restore();
+                }
+            }
+
+            for (let i = 0; i < 300; i++) particles.push(new Particle());
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach((p, i) => {
+                    p.update();
+                    p.draw();
+                    if (p.y > canvas.height) particles.splice(i, 1);
+                });
+                if (particles.length > 0) requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        function restartGame() {
+            document.getElementById('winner-modal').style.display = 'none';
+            deck = []; playerHand = []; discardPile = [];
+            direction = 1; currentTurn = 0; hasDrawnThisTurn = false;
+            playerHands = Array.from({ length: numPlayers }, () => []);
+            unoShouted = new Array(numPlayers).fill(false);
+            initGame();
+        }
+
+        function updateTurnIndicator() {
+            document.querySelectorAll('.jugador-info').forEach(el => el.classList.remove('turno-activo'));
+            document.getElementById('mi-turno-label').style.display = 'none';
+            let selector = '';
+            if (currentTurn === 0) selector = '.jugador-bottom .jugador-info';
+            else if (currentTurn === 1 && numPlayers > 1) selector = '.jugador-top .jugador-info';
+            else if (currentTurn === 2 && numPlayers > 2) selector = '.jugador-left .jugador-info';
+            else if (currentTurn === 3 && numPlayers > 3) selector = '.jugador-right .jugador-info';
+            const active = document.querySelector(selector);
+            if (active) active.classList.add('turno-activo');
+            if (currentTurn === 0) document.getElementById('mi-turno-label').style.display = 'block';
+        }
+
+        function toggleConfig() {
+            const modal = document.getElementById('config-modal');
+            modal.style.display = (modal.style.display === 'flex' || modal.style.display === '') ? 'none' : 'flex';
+        }
+
+        function goToMenu() {
+            if (confirm("¿Estás seguro de que quieres salir al menú principal?")) {
+                window.location.href = "index.html";
+            }
+        }
+
+        function initGame() {
+            cargarConfiguracion();
+            deck = createDeck();
+            for (let p = 0; p < numPlayers; p++) {
+                for (let i = 0; i < 7; i++) playerHands[p].push(drawCard());
+            }
+            playerHand = playerHands[0];
+
+            let first = drawCard();
+            while (first.color === 'negro') {
+                deck.unshift(first);
+                first = drawCard();
+            }
+            discardPile = [first];
+
+            updateDiscard();
+            renderAllHands();
+
+            let nombreJugador = "EVEN";
+            try {
+                nombreJugador = localStorage.getItem('nombreJugador') || "Galaxy Player";
+            } catch (e) {}
+            document.getElementById('mi-nombre').textContent = nombreJugador;
+
+            updateTurnIndicator();
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>

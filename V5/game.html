@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNO Party Galactic - Partida</title>
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Poppins:wght@600;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./src/style-game.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Fondo galáctico -->
+        <div class="game-background"></div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="player-info">
+                <span id="current-player">Jugador: NAM</span>
+            </div>
+            <div class="logo-small">UNO</div>
+            <button id="btn-uno" class="btn-uno">¡UNO!</button>
+        </div>
+
+        <!-- Oponentes (arriba) -->
+        <div class="opponents" id="opponents">
+            <!-- Se generan con JS -->
+        </div>
+
+        <!-- Mesa central -->
+        <div class="table">
+            <!-- Mazo para robar -->
+            <div class="draw-pile" id="draw-pile">
+                <div class="card back"></div>
+                <p class="pile-text">ROBAR</p>
+                <span id="draw-count">45</span>
+            </div>
+
+            <!-- Carta en la mesa (descarte) -->
+            <div class="discard-pile" id="discard-pile">
+                <!-- Carta actual se agrega con JS -->
+            </div>
+        </div>
+
+        <!-- Tu mano -->
+        <div class="player-hand" id="player-hand">
+            <!-- Tus cartas se generan aquí -->
+        </div>
+
+        <!-- Controles inferiores -->
+        <div class="controls">
+            <button id="btn-colorir" class="btn-action" style="display: none;">Cambiar Color</button>
+            <button id="btn-pass" class="btn-action">PASAR</button>
+        </div>
+    </div>
+
+    <script type="module" src="./src/game.ts"></script>
+</body>
+</html>

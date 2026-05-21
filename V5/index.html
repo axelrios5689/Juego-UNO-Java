@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNO Party Galactic</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Poppins:wght@600;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+    <!-- Fondo galáctico -->
+    <div id="fondo">
+        <div class="nebula"></div>
+        <div class="grid"></div>
+        
+        <div class="rayo" style="left: 15%; animation-delay: 0s; transform: rotate(12deg);"></div>
+        <div class="rayo rayo2" style="left: 35%; animation-delay: 1.5s; transform: rotate(-8deg);"></div>
+        <div class="rayo rayo3" style="left: 55%; animation-delay: 3s; transform: rotate(15deg);"></div>
+        <div class="rayo rayo2" style="left: 72%; animation-delay: 0.8s; transform: rotate(-12deg);"></div>
+        <div class="rayo" style="left: 88%; animation-delay: 4s; transform: rotate(7deg);"></div>
+        
+        <div class="particles" id="particles"></div>
+        <div class="energia"></div>
+        <div class="energia2"></div>
+    </div>
+    <div class="contenido">
+        <div class="logo">UNO</div>
+        
+        <div class="config">
+            <label class="label">Nombre del Jugador</label>
+            <input type="text" id="player-name" value="Galactic_Name" maxlength="15">
+            
+            <label class="label">Número de Jugadores</label>
+            <div class="jugadores">
+                <div class="opcion" data-cantidad="2">2</div>
+                <div class="opcion seleccionado" data-cantidad="3">3</div>
+                <div class="opcion" data-cantidad="4">4</div>
+            </div>
+            
+            <button class="btn-empezar" id="btn-iniciar">
+                ¡INICIAR PARTIDA!
+            </button>
+        </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
